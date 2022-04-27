@@ -46,7 +46,7 @@ public class AIBehavior : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {   
+    {
         enemyhealth = 3;
         patience = Random.Range(patienceMin, patienceMax);
 
@@ -59,8 +59,10 @@ public class AIBehavior : MonoBehaviour
 
     void Update()
     {
+        // Debug.Log("Distance Traveled: " + distanceTraveled);
+        // Debug.Log("Patience: " + patience);
         distanceTraveled += Vector3.Distance(lastPosition, transform.position);
-        Debug.Log("Distance Traveled: " + distanceTraveled);
+
         if (dead == true)
         {
             startDeathState();
@@ -80,11 +82,12 @@ public class AIBehavior : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        Debug.Log(Vector3.Distance(player.transform.position, transform.position));
+        // Debug.Log(Vector3.Distance(player.transform.position, transform.position));
         if (animationEnd == false) {/*do nothing*/}
         else
         {
-            if(steppingBack == true){
+            if (steppingBack == true)
+            {
                 startIdleState();
                 endIdleState();
             }
@@ -93,10 +96,11 @@ public class AIBehavior : MonoBehaviour
                 patience -= 1;
                 if (patience <= 0)
                 {
-                    StartCoroutine(startAttackState());
+                    startAttackState();
                     return;
                 }
-                else{
+                else
+                {
                     distanceTraveled = 0;
                     startIdleState();
                     endIdleState();
@@ -115,7 +119,8 @@ public class AIBehavior : MonoBehaviour
         m_HitReg.enemyBodyCollide = true;
     }
 
-    void OnCollisionExit(Collision collision){
+    void OnCollisionExit(Collision collision)
+    {
         m_HitReg.enemyBodyCollide = false;
     }
 
@@ -123,9 +128,11 @@ public class AIBehavior : MonoBehaviour
     {
         // Debug.Log("Accessing State: Idle");
         //m_Animation.SetFloat("Speed", 0, 0.1f, Time.deltaTime);
-        Move(Vector3.MoveTowards(transform.position, player.transform.position, -1 *walkSpeedStrafe * Time.deltaTime));
+        Move(Vector3.MoveTowards(transform.position, player.transform.position, -1 * walkSpeedStrafe * Time.deltaTime));
+        // Move(Vector3.MoveTowards(transform.position, player.transform.position, walkSpeedStrafe * Time.deltaTime));
         steppingBack = true;
-        if(distanceTraveled >= maxWalkBack){
+        if (distanceTraveled >= maxWalkBack)
+        {
             steppingBack = false;
             distanceTraveled = 0;
         }
@@ -137,21 +144,14 @@ public class AIBehavior : MonoBehaviour
         //set neutral
     }
 
-    IEnumerator startAttackState()
+    private void startAttackState()
     {
         Debug.Log("Accessing State: Attack");
         animationEnd = false;
-        // m_Animation.Play("Attack");
 
-        m_Animation.SetLayerWeight(m_Animation.GetLayerIndex("Attack Layer"), 1);
         m_Animation.SetTrigger("Attack");
-        yield return new WaitForSeconds(0.9f);
-        m_Animation.SetLayerWeight(m_Animation.GetLayerIndex("Attack Layer"), 0);
-
-        //while(m_Animation.isPlaying){}
         m_AudioController.state = "enemy swing";
         endAttackState();
-        yield return null;
     }
 
     private void endAttackState()
@@ -164,12 +164,6 @@ public class AIBehavior : MonoBehaviour
 
     private void Move(Vector3 moveVector)
     {
-        // Debug.Log("Accessing State: Walk");
-        // currentState = "Walk";
-        //m_Animation.PlayQueued("Walk");
-        // Vector3 moveVector = Vector3.MoveTowards(transform.position, player.transform.position, walkSpeedStrafe * Time.deltaTime);
-        // m_Rigidbody.MovePosition(Vector3.MoveTowards(transform.position, player.transform.position, walkSpeed * Time.deltaTime));
-
         if (moveVector != Vector3.zero)
         {
             UpdateSpeed(moveVector);
